@@ -73,13 +73,13 @@ def mixup() :
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     torch.cuda.is_available()
 
-    net = EfficientNet.from_pretrained('efficientnet-b3',num_classes = 88)
+    net = EfficientNet.from_pretrained('efficientnet-b5',num_classes = 88)
 
     net.fc = nn.Linear(1000,88)
     net = net.to(device)
 
     criterion = CrossEntropyLoss()
-    optimizer = optim.Adam(params = net.parameters(), lr = 0.001)
+    optimizer = optim.Adam(params = net.parameters(), lr = 0.0001)
 
 
     epoch = 100

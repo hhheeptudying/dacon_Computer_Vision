@@ -1,1 +1,1 @@
-from cutmix.cutmix import CutMix
+from cutmix import data_load, mix_aug, train
