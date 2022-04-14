@@ -204,45 +204,6 @@ def train(args, args2):
 
     return save_path
 
-    # epochs = args.epochs
-    # model = Network().to(device)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    # criterion = nn.CrossEntropyLoss()
-    # scaler = torch.cuda.amp.GradScaler()
-    #
-    # best_score = 0
-    # for epoch in range(epochs):
-    #     start = time.time()
-    #     train_loss = 0
-    #     train_pred = []
-    #     train_y = []
-    #     model.train()
-    #     for batch in (train_loader):
-    #         optimizer.zero_grad()
-    #         x = torch.tensor(batch[0], dtype=torch.float32, device=device)
-    #         y = torch.tensor(batch[1], dtype=torch.long, device=device)
-    #         with torch.cuda.amp.autocast():
-    #             pred = model(x)
-    #         loss = criterion(pred, y)
-    #
-    #         scaler.scale(loss).backward()
-    #         scaler.step(optimizer)
-    #         scaler.update()
-    #
-    #         train_loss += loss.item() / len(train_loader)
-    #         train_pred += pred.argmax(1).detach().cpu().numpy().tolist()
-    #         train_y += y.detach().cpu().numpy().tolist()
-    #
-    #     train_f1 = score_function(train_y, train_pred)
-    #
-    #     TIME = time.time() - start
-    #     print(f'epoch : {epoch + 1}/{epochs}    time : {TIME:.0f}s/{TIME * (epochs - epoch - 1):.0f}s')
-    #     print(f'TRAIN    loss : {train_loss:.5f}    f1 : {train_f1:.5f}')
-    #
-    #     if train_f1 > best_score or epoch % 10 == 0:
-    #         best_score = train_f1
-    #         torch.save(model.state_dict(), '%s/model/regnety_040/%d_epoch_model.pth' % (root, epoch))
-
 
 def test(root, test_loader, label_unique):
     model = Network_test('regnety_040').to(device)
@@ -306,25 +267,7 @@ def main(args):
     sub.iloc[:, 1] = ensemble.argmax(axis=1)
     sub.to_csv(f'./submission.csv', index=False)
 
-    '''
-    if args.train:
-        #train_imgs = [img_load(m) for m in tqdm(train_png)]
-        Trainer(args, args2, root)
-        with open('%s/data/train.pkl' % root, 'rb') as f:
-            train_imgs = pickle.load(f)
-        train_dataset = Custom_dataset(np.array(train_imgs), np.array(train_labels), mode='train')
-        train_loader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size)
-        train(args, root, train_loader)
-
-    elif args.test:
-        #test_imgs = [img_load(n) for n in tqdm(test_png)]
-        with open('%s/data/test.pkl' % root, 'rb') as f:
-            test_imgs = pickle.load(f)
-        test_dataset = Custom_dataset(np.array(test_imgs), np.array(["tmp"] * len(test_imgs)), mode='test')
-        test_loader = DataLoader(test_dataset, shuffle=False, batch_size=batch_size)
-        test(root, test_loader, label_unique)
-    '''
-
+    
 '''
 # Dataset을 pkl 파일로 저장
 #with open('/mnt/dms/PMH/dacon_anomalib/data/train.pkl', 'wb') as f:
