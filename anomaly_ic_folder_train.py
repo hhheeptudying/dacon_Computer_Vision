@@ -103,8 +103,8 @@ def img_load(path):
 
 def normalize_train_dataset(train_imgs):
     # To normalize the dataset, calculate the mean and std
-    train_meanRGB = [np.mean(x.numpy(), axis=(1, 2)) for x, _ in train_imgs]
-    train_stdRGB = [np.std(x.numpy(), axis=(1, 2)) for x, _ in train_imgs]
+    train_meanRGB = [np.mean(x, axis=(1, 2)) for x in train_imgs]
+    train_stdRGB = [np.std(x, axis=(1, 2)) for x in train_imgs]
 
     train_meanR = np.mean([m[0] for m in train_meanRGB])
     train_meanG = np.mean([m[1] for m in train_meanRGB])
@@ -117,8 +117,8 @@ def normalize_train_dataset(train_imgs):
 
 
 def normalize_test_dataset(test_imgs):
-    test_meanRGB = [np.mean(x.numpy(), axis=(1, 2)) for x, _ in test_imgs]
-    test_stdRGB = [np.std(x.numpy(), axis=(1, 2)) for x, _ in test_imgs]
+    test_meanRGB = [np.mean(x, axis=(1, 2)) for x in test_imgs]
+    test_stdRGB = [np.std(x, axis=(1, 2)) for x in test_imgs]
 
     test_meanR = np.mean([m[0] for m in test_meanRGB])
     test_meanG = np.mean([m[1] for m in test_meanRGB])
@@ -210,13 +210,15 @@ def train_test_dataloader(data, batch_size, mode="train"):
         return test_loader
 
 
-def run_train(train_loader, epochs):
+def run_train(train_loader, epochs, save_path):
+    if not os.path.exists(save_path):
+            os.makedirs(save_path)
     model = Network().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     criterion = nn.CrossEntropyLoss()
     scaler = torch.cuda.amp.GradScaler()
 
-    print(f"-----------------------Start Training-----------------------")
+    print("-----------------------Start Training-----------------------")
     best_score = 0
     for epoch in range(epochs):
         start = time.time()
@@ -252,7 +254,7 @@ def run_train(train_loader, epochs):
         if epoch >= 10 and train_f1 >= best_score:
             torch.save(
                 model.state_dict(),
-                "open/aug_Effi_b4_1024" + f"/best_f1_epoch{epoch+1}.pth",
+                save_path + f"/best_f1_epoch{epoch+1}.pth",
             )
             best_score = train_f1
             print(f"model is saved when epoch is : {epoch+1}")
@@ -263,10 +265,9 @@ if __name__ == "__main__":
     train_data = torchvision.datasets.ImageFolder(root="open/split")
     test_data = sorted(glob("open/test/*.png"))
     # load pickle data
-    #with open("train_data", "rb") as file:
+    # with open("train_data", "rb") as file:
     #    train_imgs = pickle.load(file)
-        
     train_imgs, test_imgs, train_labels = train_test_data(train_data, test_data)
     train_loader = train_test_dataloader(train_imgs, batch_size=8, mode="train")
     seed_everything()
-    run_train(train_loader, epochs=100)
+    run_train(train_loader, epochs=100, save_path="open/aug_Effi_b4_700_normal")
